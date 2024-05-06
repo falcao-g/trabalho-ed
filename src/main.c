@@ -6,6 +6,9 @@
 
 #include "./hash.c"
 
+#define ANSI_PURPLE "\e[38;5;92m"
+#define ANSI_RESET "\e[0m"
+
 typedef struct {
     char codigo_ibge[10];
     char nome[40];
@@ -23,17 +26,22 @@ char *get_key(void *reg) {
     return (*((tmunicipio *)reg)).codigo_ibge;
 }
 
-void insere_cidade(thash cidades, tmunicipio *municipio) {
+char *get_key2(void *reg) {
+    return (*((tmunicipio *)reg)).nome;
+}
+
+void insere_cidade(thash hash_cod, thash hash_nome, tmunicipio *municipio) {
     tmunicipio *municipio_aux = malloc(sizeof(tmunicipio));
     memcpy(municipio_aux, municipio, sizeof(tmunicipio));
-    hash_insere(&cidades, municipio_aux);
+    hash_insere(&hash_cod, municipio_aux);
+    hash_insere(&hash_nome, municipio_aux);
 }
 
 // to do: improve this function
-void leitor_json(FILE *arquivo, thash cidades) {
-    char linha[200];
+void leitor_json(FILE *arquivo, thash hash_cod, thash hash_nome) {
+    char linha[150];
     tmunicipio municipio;
-    while (fgets(linha, 200, arquivo)) {
+    while (fgets(linha, 150, arquivo)) {
         if (strstr(linha, "codigo_ibge")) {
             sscanf(linha, "    \"codigo_ibge\": %[^,],", municipio.codigo_ibge);
         }
@@ -61,47 +69,82 @@ void leitor_json(FILE *arquivo, thash cidades) {
         if (strstr(linha, "fuso_horario")) {
             sscanf(linha, "    \"fuso_horario\": \"%[^\"]\",",
                    municipio.fuso_horario);
-            insere_cidade(cidades, &municipio);
+            insere_cidade(hash_cod, hash_nome, &municipio);
         }
     }
 }
 
+void imprime_municipio(tmunicipio *municipio) {
+    if (municipio == NULL) {
+        printf("Cidade não encontrada\n");
+    }
+    printf("%sCódigo IBGE: %s%s\n", ANSI_PURPLE, ANSI_RESET,
+           municipio->codigo_ibge);
+    printf("%sNome: %s%s\n", ANSI_PURPLE, ANSI_RESET, municipio->nome);
+    printf("%sLatitude: %s%f\n", ANSI_PURPLE, ANSI_RESET, municipio->latitude);
+    printf("%sLongitude: %s%f\n", ANSI_PURPLE, ANSI_RESET,
+           municipio->longitude);
+    printf("%sCapital: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->capital);
+    printf("%sCódigo UF: %s%d\n", ANSI_PURPLE, ANSI_RESET,
+           municipio->codigo_uf);
+    printf("%sSiafi ID: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->siafi_id);
+    printf("%sDDD: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->ddd);
+    printf("%sFuso Horário: %s%s\n", ANSI_PURPLE, ANSI_RESET,
+           municipio->fuso_horario);
+}
+
 int main() {
-    thash cidades;
-    hash_constroi(&cidades, 12040, get_key);
-    leitor_json(fopen("../public/municipios.json", "r"), cidades);
+    thash hash_cod;
+    hash_constroi(&hash_cod, 12040, get_key);
+    thash hash_nome;
+    hash_constroi(&hash_nome, 12040, get_key2);
+    leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome);
 
     while (1) {
         printf("--------------------\n");
         printf("1 - Buscar cidade pelo código IBGE\n");
-        printf("2 - Sair\n");
+        printf("2 - Buscar cidade pelo nome\n");
+        printf("3 - Sair\n");
         printf("--------------------\n");
         int opcao;
         printf("Digite a opção desejada: ");
         scanf("%d", &opcao);
 
-        if (opcao == 2) {
-            break;
-        }
+        switch (opcao) {
+            case 1:
+                printf("--------------------\n");
+                char codigo_ibge[10];
+                printf("Digite o código IBGE da cidade: ");
+                scanf("%s", codigo_ibge);
+                printf("--------------------\n");
 
-        printf("--------------------\n");
-        char codigo_ibge[10];
-        printf("Digite o código IBGE da cidade: ");
-        scanf("%s", codigo_ibge);
-        printf("--------------------\n");
+                tmunicipio *municipio = hash_busca(hash_cod, codigo_ibge);
+                imprime_municipio(municipio);
+                break;
 
-        tmunicipio *municipio = hash_busca(cidades, codigo_ibge);
-        if (municipio != NULL) {
-            printf("Nome: %s\n", municipio->nome);
-            printf("Latitude: %f\n", municipio->latitude);
-            printf("Longitude: %f\n", municipio->longitude);
-            printf("Capital: %d\n", municipio->capital);
-            printf("Código UF: %d\n", municipio->codigo_uf);
-            printf("Siafi ID: %d\n", municipio->siafi_id);
-            printf("DDD: %d\n", municipio->ddd);
-            printf("Fuso Horário: %s\n", municipio->fuso_horario);
-        } else {
-            printf("Cidade não encontrada\n");
+            case 2:
+                printf("--------------------\n");
+                char nome[100];
+                printf("Digite o nome da cidade: ");
+                scanf(" %[^\n]s", nome);
+                printf("--------------------\n");
+
+                // tmunicipio *municipio2 = hash_busca(hash_nome, nome);
+                // imprime_municipio(municipio2);
+                tmunicipio *municipio3 = hash_busca2(hash_nome, nome);
+                printf("%s\n", (*(tmunicipio **)municipio3 + 9)->nome);
+                if (municipio3 != NULL) {
+                    for (int i = 0; i < 3; i++) {
+                        imprime_municipio(*(tmunicipio **)municipio3 + i);
+                    }
+                } else {
+                    printf("Cidade não encontrada\n");
+                }
+                break;
+
+            default:
+                exit(0);
+                break;
         }
     }
 }
