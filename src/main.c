@@ -30,15 +30,17 @@ char *pega_nome(void *reg) {
     return ((tmunicipio *)reg)->nome;
 }
 
-void insere_cidade(thash hash_cod, thash hash_nome, tmunicipio *municipio) {
+void insere_cidade(thash hash_cod, thash hash_nome, tarv arv,
+                   tmunicipio *municipio) {
     tmunicipio *municipio_aux = malloc(sizeof(tmunicipio));
     memcpy(municipio_aux, municipio, sizeof(tmunicipio));
     hash_insere(&hash_cod, municipio_aux);
     hash_insere(&hash_nome, municipio_aux);
+    abb_insere(&arv, municipio_aux);
 }
 
 // to do: improve this function
-void leitor_json(FILE *arquivo, thash hash_cod, thash hash_nome) {
+void leitor_json(FILE *arquivo, thash hash_cod, thash hash_nome, tarv arv) {
     char linha[150];
     tmunicipio municipio;
     while (fgets(linha, 150, arquivo)) {
@@ -61,7 +63,7 @@ void leitor_json(FILE *arquivo, thash hash_cod, thash hash_nome) {
         } else if (strstr(linha, "fuso_horario")) {
             sscanf(linha, "    \"fuso_horario\": \"%[^\"]\",",
                    municipio.fuso_horario);
-            insere_cidade(hash_cod, hash_nome, &municipio);
+            insere_cidade(hash_cod, hash_nome, arv, &municipio);
         }
     }
 }
@@ -85,11 +87,17 @@ void imprime_municipio(tmunicipio *municipio) {
            municipio->fuso_horario);
 }
 
-double cmp(void *a, void *b, int nivel) {
-    if (nivel % 2 == 0) {
+double cmp(void *a, void *b, int eixo) {
+    if (eixo % 2 == 0) {
         return ((tmunicipio *)a)->latitude - ((tmunicipio *)b)->latitude;
     }
     return ((tmunicipio *)a)->latitude - ((tmunicipio *)b)->latitude;
+}
+
+double dist(void *a, void *b) {
+    double dx = cmp(a, b, 0);
+    double dy = cmp(a, b, 1);
+    return dx * dx + dy * dy;
 }
 
 int main() {
@@ -97,43 +105,14 @@ int main() {
     hash_constroi(&hash_cod, 12040, pega_codigo);
     thash hash_nome;
     hash_constroi(&hash_nome, 12040, pega_nome);
-    leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome);
-
     tarv arv;
-    abb_constroi(&arv, cmp);
+    abb_constroi(&arv, cmp, dist);
 
-    tmunicipio municipio;
-    strcpy(municipio.codigo_ibge, "1100015");
-    strcpy(municipio.nome, "Alta Floresta D'Oeste");
-    municipio.latitude = -11.9283;
-    municipio.longitude = -61.9953;
-    municipio.capital = 0;
-    municipio.codigo_uf = 11;
-    municipio.siafi_id = 1100015;
-    municipio.ddd = 69;
-    strcpy(municipio.fuso_horario, "UTC-4");
+    leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome,
+                arv);
 
-    abb_insere(&arv, &municipio);
-
-    tmunicipio municipio2;
-    strcpy(municipio2.codigo_ibge, "1100023");
-    strcpy(municipio2.nome, "Ariquemes");
-    municipio2.latitude = -9.90571;
-    municipio2.longitude = -63.0325;
-    municipio2.capital = 0;
-    municipio2.codigo_uf = 11;
-    municipio2.siafi_id = 1100023;
-    municipio2.ddd = 69;
-    strcpy(municipio2.fuso_horario, "UTC-4");
-
-    abb_insere(&arv, &municipio2);
-
-    printf("%s\n", (tarv *)arv.raiz->reg);
-    printf("%s\n", (tarv *)arv.raiz->dir->reg);
-
-    tmunicipio *municipio4 = abb_busca(&arv, "1100023");
-
-    imprime_municipio(municipio4);
+    // printf("%s\n", (tarv *)arv.raiz->reg);
+    // printf("%s\n", (tarv *)arv.raiz->dir->reg);
 
     // while (1) {
     //     printf("--------------------\n");

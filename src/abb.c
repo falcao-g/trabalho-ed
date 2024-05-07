@@ -12,9 +12,11 @@ typedef struct _abb {
     double (*dist)(void *, void *);
 } tarv;
 
-void abb_constroi(tarv *parv, double (*cmp)(void *, void *, int)) {
+void abb_constroi(tarv *parv, double (*cmp)(void *, void *, int),
+                  double (*dist)(void *, void *)) {
     parv->raiz = NULL;
     parv->cmp = cmp;
+    parv->dist = dist;
 }
 
 void abb_insere_node(tarv *parv, tnode **ppnode, void *reg, int eixo) {
@@ -39,14 +41,13 @@ void *abb_busca_node(tarv *parv, tnode *pnode, void *reg, int eixo) {
     tnode *ret;
     if (pnode == NULL) {
         ret = NULL;
-    } else if (parv->cmp(pnode, reg, eixo) > 0) { /* esquerda*/
+    } else if (parv->cmp(pnode->reg, reg, eixo) > 0) { /* esquerda*/
         ret = abb_busca_node(parv, pnode->esq, reg, eixo + 1);
-    } else if (parv->cmp(pnode, reg, eixo) < 0) { /*direita*/
+    } else if (parv->cmp(pnode->reg, reg, eixo) < 0) { /*direita*/
         ret = abb_busca_node(parv, pnode->dir, reg, eixo + 1);
     } else {
         ret = pnode->reg;
     }
-    printf("%d\n", ret);
     return ret;
 }
 
