@@ -143,15 +143,6 @@ int main() {
                 tmunicipio *municipio22 = hash_busca(hash_cod, codigo_ibge);
                 tmunicipio *municipio222 = abb_busca(&arv, municipio22);
                 imprime_municipio(municipio222);
-                // tmunicipio *municipio3 = hash_busca2(hash_nome, nome);
-                // printf("%s\n", (*(tmunicipio **)municipio3 + 9)->nome);
-                // if (municipio3 != NULL) {
-                //     for (int i = 0; i < 3; i++) {
-                //         imprime_municipio(*(tmunicipio **)municipio3 + i);
-                //     }
-                // } else {
-                //     printf("Cidade não encontrada\n");
-                // }
                 break;
 
             case 3:
