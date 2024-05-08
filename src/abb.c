@@ -25,11 +25,10 @@ void abb_insere_node(tarv *parv, tnode **ppnode, void *reg, int eixo) {
         (*ppnode)->reg = reg;
         (*ppnode)->esq = NULL;
         (*ppnode)->dir = NULL;
-        return;
     } else if (parv->cmp((*ppnode)->reg, reg, eixo) > 0) {
-        abb_insere_node(parv, &(*ppnode)->esq, reg, eixo + 1);
+        abb_insere_node(parv, &((*ppnode)->esq), reg, eixo + 1);
     } else {
-        abb_insere_node(parv, &(*ppnode)->dir, reg, eixo + 1);
+        abb_insere_node(parv, &((*ppnode)->dir), reg, eixo + 1);
     }
 }
 
