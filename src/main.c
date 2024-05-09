@@ -94,8 +94,12 @@ double cmp(void *a, void *b, int eixo) {
 }
 
 double dist(void *a, void *b) {
+    tmunicipio *debug_a = (tmunicipio *)a;
+    tmunicipio *debug_b = (tmunicipio *)b;
     double dx = cmp(a, b, 0);
     double dy = cmp(a, b, 1);
+    printf("%f\n", dx);
+    printf("%f\n", dy);
     return dx * dx + dy * dy;
 }
 
@@ -109,6 +113,19 @@ int main() {
 
     leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
+
+    theap vizinhos;
+    constroi_heap(&vizinhos, 2);
+
+    tmunicipio *municipio = hash_busca(hash_cod, "3524808");
+    abb_busca_vizinhos(&arv, municipio, &vizinhos);
+    heap_sort(&vizinhos);
+    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[0].reg)->nome,
+           vizinhos.vetor[0].dist);
+    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[1].reg)->nome,
+           vizinhos.vetor[1].dist);
+    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[2].reg)->nome,
+           vizinhos.vetor[2].dist);
 
     while (1) {
         printf("--------------------\n");

@@ -1,4 +1,7 @@
+#include <math.h>
 #include <stdlib.h>
+
+#include "heap.c"
 
 typedef struct _tnode {
     void *reg;
@@ -52,4 +55,40 @@ void *abb_busca_node(tarv *parv, tnode *pnode, void *reg, int eixo) {
 
 void *abb_busca(tarv *parv, void *reg) {
     return abb_busca_node(parv, parv->raiz, reg, 0);
+}
+
+void abb_busca_node_vizinho(tarv *parv, tnode *pnode, void *reg, int eixo,
+                            theap *vizinhos) {
+    if (pnode == NULL) {
+        return;
+    }
+
+    double dist = parv->dist(pnode->reg, reg);
+    if (dist > 0) {
+        int ret = insere_elemento(vizinhos, pnode->reg, dist);
+        if (ret == EXIT_FAILURE && dist < vizinhos->vetor[0].dist) {
+            altera_prioridade(vizinhos, 0, pnode->reg, dist);
+        }
+    }
+
+    tnode *proximo = NULL;
+    tnode *outro = NULL;
+
+    if (parv->cmp(pnode->reg, reg, eixo) > 0) {
+        proximo = pnode->esq;
+        outro = pnode->dir;
+    } else {
+        proximo = pnode->dir;
+        outro = pnode->esq;
+    }
+
+    abb_busca_node_vizinho(parv, proximo, reg, eixo + 1, vizinhos);
+
+    if (pow(parv->cmp(pnode->reg, reg, eixo), 2) < vizinhos->vetor[0].dist) {
+        abb_busca_node_vizinho(parv, outro, reg, eixo + 1, vizinhos);
+    }
+}
+
+void abb_busca_vizinhos(tarv *parv, void *reg, theap *vizinhos) {
+    abb_busca_node_vizinho(parv, parv->raiz, reg, 0, vizinhos);
 }
