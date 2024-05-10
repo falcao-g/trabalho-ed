@@ -94,12 +94,8 @@ double cmp(void *a, void *b, int eixo) {
 }
 
 double dist(void *a, void *b) {
-    tmunicipio *debug_a = (tmunicipio *)a;
-    tmunicipio *debug_b = (tmunicipio *)b;
     double dx = cmp(a, b, 0);
     double dy = cmp(a, b, 1);
-    printf("%f\n", dx);
-    printf("%f\n", dy);
     return dx * dx + dy * dy;
 }
 
@@ -114,24 +110,11 @@ int main() {
     leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
 
-    theap vizinhos;
-    constroi_heap(&vizinhos, 2);
-
-    tmunicipio *municipio = hash_busca(hash_cod, "3524808");
-    abb_busca_vizinhos(&arv, municipio, &vizinhos);
-    heap_sort(&vizinhos);
-    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[0].reg)->nome,
-           vizinhos.vetor[0].dist);
-    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[1].reg)->nome,
-           vizinhos.vetor[1].dist);
-    printf("%s %f\n", ((tmunicipio *)vizinhos.vetor[2].reg)->nome,
-           vizinhos.vetor[2].dist);
-
     while (1) {
         printf("--------------------\n");
         printf("1 - Buscar cidade pelo código IBGE\n");
-        printf("2 - Buscar cidade na KD tree\n");
-        printf("3 - Buscar cidade pelo nome\n");
+        printf("2 - Buscar cidade pelo nome\n");
+        printf("3 - Buscar N vizinhos mais próximos de uma cidade\n");
         printf("0 - Sair\n");
         printf("--------------------\n");
         int opcao;
@@ -152,18 +135,6 @@ int main() {
 
             case 2:
                 printf("--------------------\n");
-                char codigo_ibge2[100];
-                printf("Digite o código IBGE da cidade: ");
-                scanf("%s", codigo_ibge);
-                printf("--------------------\n");
-
-                tmunicipio *municipio22 = hash_busca(hash_cod, codigo_ibge);
-                tmunicipio *municipio222 = abb_busca(&arv, municipio22);
-                imprime_municipio(municipio222);
-                break;
-
-            case 3:
-                printf("--------------------\n");
                 char nome[100];
                 printf("Digite o nome da cidade: ");
                 scanf(" %[^\n]s", nome);
@@ -180,6 +151,34 @@ int main() {
                 // } else {
                 //     printf("Cidade não encontrada\n");
                 // }
+                break;
+
+            case 3:
+                printf("--------------------\n");
+                char nome2[100];
+                int n;
+                printf("Digite o nome da cidade: ");
+                scanf(" %[^\n]s", nome2);
+                printf("Digite o número de vizinhos: ");
+                scanf("%d", &n);
+                printf("--------------------\n");
+
+                theap vizinhos;
+                constroi_heap(&vizinhos, n);
+
+                tmunicipio *municipio3 = hash_busca(hash_nome, nome2);
+                abb_busca_vizinhos(&arv, municipio3, &vizinhos);
+                heap_sort(&vizinhos);
+                for (int i = 0; i < n; i++) {
+                    if (i + 1 != 1)
+                        printf("%dº ", i + 1);
+                    printf("vizinho mais próximo: \n");
+                    imprime_municipio(vizinhos.vetor[i].reg);
+                    printf("%sDistância: %s%:.2fkm\n", ANSI_PURPLE, ANSI_RESET,
+                           sqrt(vizinhos.vetor[i].dist) * 100);
+                    if (i != n - 1)
+                        printf("--------------------\n");
+                }
                 break;
 
             default:

@@ -13,9 +13,9 @@ typedef struct {
 } theap;
 
 void troca(treg *a, treg *b) {
-    treg *aux = a;
-    a = b;
-    b = aux;
+    treg aux = *a;
+    *a = *b;
+    *b = aux;
 }
 
 int pai(int n) {
