@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,7 +107,7 @@ int main() {
     tarv arv;
     abb_constroi(&arv, cmp, dist);
 
-    leitor_json(fopen("../public/municipios.json", "r"), hash_cod, hash_nome,
+    leitor_json(fopen("../data/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
 
     while (1) {
@@ -174,7 +174,7 @@ int main() {
                         printf("%dº ", i + 1);
                     printf("vizinho mais próximo: \n");
                     imprime_municipio(vizinhos.vetor[i].reg);
-                    printf("%sDistância: %s%:.2fkm\n", ANSI_PURPLE, ANSI_RESET,
+                    printf("%sDistância: %s%.2fkm\n", ANSI_PURPLE, ANSI_RESET,
                            sqrt(vizinhos.vetor[i].dist) * 100);
                     if (i != n - 1)
                         printf("--------------------\n");
