@@ -92,3 +92,12 @@ void abb_busca_node_vizinho(tarv *parv, tnode *pnode, void *reg, int eixo,
 void abb_busca_vizinhos(tarv *parv, void *reg, theap *vizinhos) {
     abb_busca_node_vizinho(parv, parv->raiz, reg, 0, vizinhos);
 }
+
+void abb_apaga(tnode *pnode) {
+    if (pnode == NULL) {
+        return;
+    }
+    abb_apaga(pnode->esq);
+    abb_apaga(pnode->dir);
+    free(pnode);
+}

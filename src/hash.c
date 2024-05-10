@@ -13,7 +13,6 @@ typedef struct {
     char *(*get_key)(void *);
 } thash;
 
-// change this function and add another one
 uint32_t hashf(const char *str, uint32_t h) {
     /* One-byte-at-a-time Murmur hash
     Source: https://github.com/aappleby/smhasher/blob/master/src/Hashes.cpp */
@@ -77,31 +76,6 @@ void *hash_busca(thash h, const char *key) {
     }
 
     return NULL;
-}
-
-// create a new search function that returns an array of void pointers if they
-// have the same key
-void *hash_busca2(thash h, const char *key) {
-    uint32_t hash = hashf(key, SEED);
-    int pos = hash % (h.max);
-    int i = 0;
-    uintptr_t *array = malloc(sizeof(void *) * h.size);
-    int j = 0;
-
-    while (h.table[pos] != 0) {
-        printf("%s\n", h.get_key((void *)h.table[pos]));
-        printf("%s\n", key);
-        if (strcmp(h.get_key((void *)h.table[pos]), key) == 0) {
-            printf("entrou\n");
-            printf("%d\n", j);
-            array[j] = h.table[pos];
-            j += 1;
-        }
-        pos = (hash + i * hash) % h.max;
-        i += 1;
-    }
-
-    return array;
 }
 
 int hash_remove(thash *h, const char *key) {

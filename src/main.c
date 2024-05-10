@@ -110,6 +110,7 @@ int main() {
     leitor_json(fopen("../data/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
 
+    tmunicipio *pesquisa;
     while (1) {
         printf("--------------------\n");
         printf("1 - Buscar cidade pelo código IBGE\n");
@@ -129,8 +130,8 @@ int main() {
                 scanf("%s", codigo_ibge);
                 printf("--------------------\n");
 
-                tmunicipio *municipio = hash_busca(hash_cod, codigo_ibge);
-                imprime_municipio(municipio);
+                pesquisa = hash_busca(hash_cod, codigo_ibge);
+                imprime_municipio(pesquisa);
                 break;
 
             case 2:
@@ -140,8 +141,8 @@ int main() {
                 scanf(" %[^\n]s", nome);
                 printf("--------------------\n");
 
-                tmunicipio *municipio2 = hash_busca(hash_nome, nome);
-                imprime_municipio(municipio2);
+                pesquisa = hash_busca(hash_nome, nome);
+                imprime_municipio(pesquisa);
                 // tmunicipio *municipio3 = hash_busca2(hash_nome, nome);
                 // printf("%s\n", (*(tmunicipio **)municipio3 + 9)->nome);
                 // if (municipio3 != NULL) {
@@ -154,6 +155,7 @@ int main() {
                 break;
 
             case 3:
+                // tem que fazer a busca por nome primeiro
                 printf("--------------------\n");
                 char nome2[100];
                 int n;
@@ -161,6 +163,11 @@ int main() {
                 scanf(" %[^\n]s", nome2);
                 printf("Digite o número de vizinhos: ");
                 scanf("%d", &n);
+
+                while (n > 5569 || n < 1) {
+                    printf("Digite um número de vizinhos válido: ");
+                    scanf("%d", &n);
+                }
                 printf("--------------------\n");
 
                 theap vizinhos;
@@ -179,9 +186,13 @@ int main() {
                     if (i != n - 1)
                         printf("--------------------\n");
                 }
+                heap_apaga(&vizinhos);
                 break;
 
             default:
+                hash_apaga(&hash_cod);
+                abb_apaga(arv.raiz);
+                free(pesquisa);
                 exit(0);
                 break;
         }

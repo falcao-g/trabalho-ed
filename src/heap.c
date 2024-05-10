@@ -97,3 +97,7 @@ int insere_elemento(theap *pheap, void *reg, double dist) {
 
     return EXIT_SUCCESS;
 }
+
+void heap_apaga(theap *pheap) {
+    free(pheap->vetor);
+}
