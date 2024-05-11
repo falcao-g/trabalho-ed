@@ -70,6 +70,7 @@ void leitor_json(FILE *arquivo, thash hash_cod, thash hash_nome, tarv *arv) {
 void imprime_municipio(tmunicipio *municipio) {
     if (municipio == NULL) {
         printf("Cidade não encontrada\n");
+        return;
     }
     printf("%sCódigo IBGE: %s%s\n", ANSI_PURPLE, ANSI_RESET,
            municipio->codigo_ibge);
@@ -106,26 +107,28 @@ int main() {
     hash_constroi(&hash_nome, 12040, pega_nome);
     tarv arv;
     abb_constroi(&arv, cmp, dist);
+    theap vizinhos;
 
     leitor_json(fopen("../data/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
 
     tmunicipio *pesquisa;
+    char codigo_ibge[10];
+    int n;
+    int opcao;
     while (1) {
         printf("--------------------\n");
         printf("1 - Buscar cidade pelo código IBGE\n");
-        printf("2 - Buscar cidade pelo nome\n");
-        printf("3 - Buscar N vizinhos mais próximos de uma cidade\n");
+        printf("2 - Buscar N vizinhos pelo código IBGE\n");
+        printf("3 - Buscar N vizinhos pelo nome da cidade\n");
         printf("0 - Sair\n");
         printf("--------------------\n");
-        int opcao;
         printf("Digite a opção desejada: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
             case 1:
                 printf("--------------------\n");
-                char codigo_ibge[10];
                 printf("Digite o código IBGE da cidade: ");
                 scanf("%s", codigo_ibge);
                 printf("--------------------\n");
@@ -136,31 +139,42 @@ int main() {
 
             case 2:
                 printf("--------------------\n");
-                char nome[100];
-                printf("Digite o nome da cidade: ");
-                scanf(" %[^\n]s", nome);
+                printf("Digite o código IBGE da cidade: ");
+                scanf("%s", codigo_ibge);
+                printf("Digite o número de vizinhos: ");
+                scanf("%d", &n);
+
+                while (n > 5569 || n < 1) {
+                    printf("Digite um número de vizinhos válido: ");
+                    scanf("%d", &n);
+                }
                 printf("--------------------\n");
 
-                pesquisa = hash_busca(hash_nome, nome);
-                imprime_municipio(pesquisa);
-                // tmunicipio *municipio3 = hash_busca2(hash_nome, nome);
-                // printf("%s\n", (*(tmunicipio **)municipio3 + 9)->nome);
-                // if (municipio3 != NULL) {
-                //     for (int i = 0; i < 3; i++) {
-                //         imprime_municipio(*(tmunicipio **)municipio3 + i);
-                //     }
-                // } else {
-                //     printf("Cidade não encontrada\n");
-                // }
+                pesquisa = hash_busca(hash_cod, codigo_ibge);
+
+                if (pesquisa == NULL) {
+                    printf("Cidade não encontrada\n");
+                    break;
+                }
+
+                constroi_heap(&vizinhos, n);
+                abb_busca_vizinhos(&arv, pesquisa, &vizinhos);
+                heap_sort(&vizinhos);
+
+                for (int i = 0; i < n; i++) {
+                    printf("%dº - %s\n", i + 1,
+                           ((tmunicipio *)vizinhos.vetor[i].reg)->codigo_ibge);
+                }
+                heap_apaga(&vizinhos);
                 break;
 
             case 3:
-                // tem que fazer a busca por nome primeiro
+                // THERE IS STILL SOMETHING TODO, WHICH IS TO PRINT THE CITYS
+                // WITH THE SAME NAME
                 printf("--------------------\n");
-                char nome2[100];
-                int n;
+                char nome[100];
                 printf("Digite o nome da cidade: ");
-                scanf(" %[^\n]s", nome2);
+                scanf(" %[^\n]s", nome);
                 printf("Digite o número de vizinhos: ");
                 scanf("%d", &n);
 
@@ -172,10 +186,16 @@ int main() {
 
                 theap vizinhos;
                 constroi_heap(&vizinhos, n);
+                pesquisa = hash_busca(hash_nome, nome);
 
-                tmunicipio *municipio3 = hash_busca(hash_nome, nome2);
-                abb_busca_vizinhos(&arv, municipio3, &vizinhos);
+                if (pesquisa == NULL) {
+                    printf("Cidade não encontrada\n");
+                    break;
+                }
+
+                abb_busca_vizinhos(&arv, pesquisa, &vizinhos);
                 heap_sort(&vizinhos);
+
                 for (int i = 0; i < n; i++) {
                     if (i + 1 != 1)
                         printf("%dº ", i + 1);
@@ -192,7 +212,6 @@ int main() {
             default:
                 hash_apaga(&hash_cod);
                 abb_apaga(arv.raiz);
-                free(pesquisa);
                 exit(0);
                 break;
         }
