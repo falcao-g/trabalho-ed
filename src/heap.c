@@ -35,40 +35,38 @@ void desce(theap *pheap, int n) {
     int esq = filho_esq(n);
     int dir = filho_dir(n);
 
-    if (esq < (*pheap).tam &&
-        (*pheap).vetor[esq].dist > (*pheap).vetor[maior].dist)
+    if (esq < pheap->tam && pheap->vetor[esq].dist > pheap->vetor[maior].dist)
         maior = esq;
-    if (dir < (*pheap).tam &&
-        (*pheap).vetor[dir].dist > (*pheap).vetor[maior].dist)
+    if (dir < pheap->tam && pheap->vetor[dir].dist > pheap->vetor[maior].dist)
         maior = dir;
-    double debug_esq_dist = (*pheap).vetor[esq].dist;
-    double debug_dir_dist = (*pheap).vetor[dir].dist;
-    double debug_maior_dist = (*pheap).vetor[maior].dist;
+    double debug_esq_dist = pheap->vetor[esq].dist;
+    double debug_dir_dist = pheap->vetor[dir].dist;
+    double debug_maior_dist = pheap->vetor[maior].dist;
     if (maior != n) {
-        troca(&(*pheap).vetor[n], &(*pheap).vetor[maior]);
+        troca(&pheap->vetor[n], &pheap->vetor[maior]);
         desce(pheap, maior);
     }
 }
 
 void constroi_heap(theap *pheap, int max) {
-    pheap->vetor = (treg *)malloc(sizeof(treg) * max);
-    pheap->tam = 0;
     pheap->max = max;
+    pheap->tam = 0;
+    pheap->vetor = malloc(sizeof(treg *) * max);
 }
 
 void sobe(theap *pheap, int n) {
     int p = pai(n);
 
-    if ((*pheap).vetor[p].dist < (*pheap).vetor[n].dist) {
-        troca(&(*pheap).vetor[n], &(*pheap).vetor[p]);
+    if (pheap->vetor[p].dist < pheap->vetor[n].dist) {
+        troca(&pheap->vetor[n], &pheap->vetor[p]);
         sobe(pheap, p);
     }
 }
 
 void altera_prioridade(theap *pheap, int n, void *reg, double dist) {
-    treg anterior = (*pheap).vetor[n];
-    (*pheap).vetor[n].reg = reg;
-    (*pheap).vetor[n].dist = dist;
+    treg anterior = pheap->vetor[n];
+    pheap->vetor[n].reg = reg;
+    pheap->vetor[n].dist = dist;
 
     if (anterior.dist < dist)
         sobe(pheap, n);
