@@ -78,6 +78,38 @@ void *hash_busca(thash h, const char *key) {
     return NULL;
 }
 
+void **hash_busca_repetidos(thash h, const char *key) {
+    uint32_t hash = hashf(key, SEED);
+    int pos = hash % (h.max);
+    int i = 0;
+    void **ret = malloc(sizeof(void *));
+    ret[0] = NULL;
+    int rep = 0;
+
+    while (h.table[pos] != 0) {
+        if (strcmp(h.get_key((void *)h.table[pos]), key) == 0) {
+            // se ja tem a cidade na lista, não adiciona
+            int ja_tem = 0;
+            for (int j = 0; ret[j] != NULL; j++) {
+                if (ret[j] == (void *)h.table[pos]) {
+                    ja_tem = 1;
+                    break;
+                }
+            }
+            if (ja_tem == 0) {
+                ret = realloc(ret, sizeof(void *) * (rep + 1));
+                ret[rep] = (void *)h.table[pos];
+                ret[rep + 1] = NULL;
+                rep += 1;
+            }
+        }
+        pos = (hash + i * hash) % h.max;
+        i += 1;
+    }
+
+    return ret;
+}
+
 int hash_remove(thash *h, const char *key) {
     uint32_t hash = hashf(key, SEED);
     int pos = hash % (h->max);

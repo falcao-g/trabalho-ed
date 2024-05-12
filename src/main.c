@@ -169,8 +169,6 @@ int main() {
                 break;
 
             case 3:
-                // THERE IS STILL SOMETHING TODO, WHICH IS TO PRINT THE CITYS
-                // WITH THE SAME NAME
                 printf("--------------------\n");
                 char nome[100];
                 printf("Digite o nome da cidade: ");
@@ -186,14 +184,38 @@ int main() {
 
                 theap vizinhos;
                 constroi_heap(&vizinhos, n);
-                pesquisa = hash_busca(hash_nome, nome);
+                tmunicipio **pesquisa_v =
+                    (tmunicipio **)hash_busca_repetidos(hash_nome, nome);
 
-                if (pesquisa == NULL) {
+                if (pesquisa_v[0] == NULL) {
                     printf("Cidade não encontrada\n");
                     break;
                 }
 
-                abb_busca_vizinhos(&arv, pesquisa, &vizinhos);
+                int selecao = 0;
+                int repetida = 1;
+                if (pesquisa_v[1] != NULL) {
+                    printf(
+                        "Foram encontradas mais de uma cidade com esse nome\n");
+                    printf("Selecione o munícipio desejado:\n");
+                    int i;
+                    for (i = 0; pesquisa_v[i] != NULL; i++) {
+                        printf("%d - ", repetida);
+                        imprime_municipio(pesquisa_v[i]);
+                        printf("--------------------\n");
+                        repetida += 1;
+                    }
+                    scanf("%d", &selecao);
+                    selecao -= 1;
+                    while (selecao < 0 || selecao > i) {
+                        printf("Digite um número válido: ");
+                        scanf("%d", &selecao);
+                        selecao -= 1;
+                    }
+                    printf("--------------------\n");
+                }
+
+                abb_busca_vizinhos(&arv, pesquisa_v[selecao], &vizinhos);
                 heap_sort(&vizinhos);
 
                 for (int i = 0; i < n; i++) {
