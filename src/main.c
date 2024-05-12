@@ -7,8 +7,8 @@
 #include "./abb.c"
 #include "./hash.c"
 
-#define ANSI_PURPLE "\e[38;5;92m"
-#define ANSI_RESET "\e[0m"
+#define ROXO "\e[38;5;92m"
+#define PADRAO "\e[0m"
 
 typedef struct {
     char codigo_ibge[10];
@@ -72,19 +72,15 @@ void imprime_municipio(tmunicipio *municipio) {
         printf("Cidade não encontrada\n");
         return;
     }
-    printf("%sCódigo IBGE: %s%s\n", ANSI_PURPLE, ANSI_RESET,
-           municipio->codigo_ibge);
-    printf("%sNome: %s%s\n", ANSI_PURPLE, ANSI_RESET, municipio->nome);
-    printf("%sLatitude: %s%f\n", ANSI_PURPLE, ANSI_RESET, municipio->latitude);
-    printf("%sLongitude: %s%f\n", ANSI_PURPLE, ANSI_RESET,
-           municipio->longitude);
-    printf("%sCapital: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->capital);
-    printf("%sCódigo UF: %s%d\n", ANSI_PURPLE, ANSI_RESET,
-           municipio->codigo_uf);
-    printf("%sSiafi ID: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->siafi_id);
-    printf("%sDDD: %s%d\n", ANSI_PURPLE, ANSI_RESET, municipio->ddd);
-    printf("%sFuso Horário: %s%s\n", ANSI_PURPLE, ANSI_RESET,
-           municipio->fuso_horario);
+    printf("%sCódigo IBGE: %s%s\n", ROXO, PADRAO, municipio->codigo_ibge);
+    printf("%sNome: %s%s\n", ROXO, PADRAO, municipio->nome);
+    printf("%sLatitude: %s%f\n", ROXO, PADRAO, municipio->latitude);
+    printf("%sLongitude: %s%f\n", ROXO, PADRAO, municipio->longitude);
+    printf("%sCapital: %s%d\n", ROXO, PADRAO, municipio->capital);
+    printf("%sCódigo UF: %s%d\n", ROXO, PADRAO, municipio->codigo_uf);
+    printf("%sSiafi ID: %s%d\n", ROXO, PADRAO, municipio->siafi_id);
+    printf("%sDDD: %s%d\n", ROXO, PADRAO, municipio->ddd);
+    printf("%sFuso Horário: %s%s\n", ROXO, PADRAO, municipio->fuso_horario);
 }
 
 double cmp(void *a, void *b, int eixo) {
@@ -223,7 +219,7 @@ int main() {
                         printf("%dº ", i + 1);
                     printf("vizinho mais próximo: \n");
                     imprime_municipio(vizinhos.vetor[i].reg);
-                    printf("%sDistância: %s%.2fkm\n", ANSI_PURPLE, ANSI_RESET,
+                    printf("%sDistância: %s%.2fkm\n", ROXO, PADRAO,
                            sqrt(vizinhos.vetor[i].dist) * 100);
                     if (i != n - 1)
                         printf("--------------------\n");
