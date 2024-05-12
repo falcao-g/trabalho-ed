@@ -218,7 +218,9 @@ int main() {
                     if (i + 1 != 1)
                         printf("%dº ", i + 1);
                     printf("vizinho mais próximo: \n");
-                    imprime_municipio(vizinhos.vetor[i].reg);
+                    char *codigo =
+                        ((tmunicipio *)vizinhos.vetor[i].reg)->codigo_ibge;
+                    imprime_municipio(hash_busca(hash_cod, codigo));
                     printf("%sDistância: %s%.2fkm\n", ROXO, PADRAO,
                            sqrt(vizinhos.vetor[i].dist) * 100);
                     if (i != n - 1)
