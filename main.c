@@ -105,7 +105,7 @@ int main() {
     abb_constroi(&arv, cmp, dist);
     theap vizinhos;
 
-    leitor_json(fopen("../data/municipios.json", "r"), hash_cod, hash_nome,
+    leitor_json(fopen("./data/municipios.json", "r"), hash_cod, hash_nome,
                 &arv);
 
     tmunicipio *pesquisa;
