@@ -39,9 +39,6 @@ void desce(theap *pheap, int n) {
         maior = esq;
     if (dir < pheap->tam && pheap->vetor[dir].dist > pheap->vetor[maior].dist)
         maior = dir;
-    double debug_esq_dist = pheap->vetor[esq].dist;
-    double debug_dir_dist = pheap->vetor[dir].dist;
-    double debug_maior_dist = pheap->vetor[maior].dist;
     if (maior != n) {
         troca(&pheap->vetor[n], &pheap->vetor[maior]);
         desce(pheap, maior);
